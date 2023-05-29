@@ -1,0 +1,764 @@
+```{r}
+
+df = read.csv("C:\\Users\\gudgu\\Desktop\\data.csv")
+
+print(head(df))
+
+
+
+```
+
+```{r}
+
+
+df <- subset(df, select = -c(ID, 5))
+
+print(head(df))
+
+
+```
+
+```{r}
+
+summary(df)
+
+
+```
+
+```{r}
+experience_negative <- df$Experience[df$Experience < 0]
+table(experience_negative)
+
+```
+
+
+```{r}
+df$Experience <- abs(df$Experience)
+```
+
+
+```{r}
+# Assuming your dataset is stored in a variable called 'data'
+# Use colSums() and is.na() to count missing values in each column
+missing_values <- colSums(is.na(df))
+
+# Print the missing values count for each column
+print(missing_values)
+
+```
+
+```{r}
+
+age <- df$Age
+hist(age, breaks = 20, main = "Age Distribution", xlab = "Age", xlim = c(min(age),max(age)),col = "lightblue")
+
+
+```
+
+```{r}
+
+library(e1071)
+
+ccavg <- df$CCAvg
+# Calculate mean, median, and standard deviation
+mean_val <- mean(ccavg)
+sd_val <- sd(ccavg)
+kurt_val = kurtosis(ccavg)
+# Calculate skewness
+skewness_val <- skewness(ccavg)
+
+hist(ccavg, breaks = 20, main = "CCAvg Distribution", xlab = "CCAvg", col = "lightgreen")
+
+legend(x = "topright",
+       legend = c(paste("Mean:", round(mean_val, 2)),
+                  paste("Standard Deviation:", round(sd_val, 2)),
+                  paste("Kurtosis:", round(kurt_val, 2)),
+                  paste("Skewness:", round(skewness_val, 2))),
+       bty = "n", col = "black", cex = 1.2)
+
+```
+
+```{r}
+income <- df$Income
+hist(income, breaks = 20, main = "Income Distribution", xlab = "Income",col = "#FFCC99")
+# Calculate mean, median, and standard deviation
+mean_val <- mean(income)
+kurt_val = kurtosis(income)
+sd_val <- sd(income)
+skewness_val = skewness(income)
+legend(x = "topright",
+       legend = c(paste("Mean:", round(mean_val, 2)),
+                  paste("Standard Deviation:", round(sd_val, 2)),
+                  paste("Kurtosis:", round(kurt_val, 2)),
+                  paste("Skewness:", round(skewness_val, 2))),
+       bty = "n", col = "black", cex = 1.4)
+
+```
+```{r}
+mortgage <- df$Mortgage
+hist(mortgage, breaks = 30, main = "Mortgage Distribution", xlab = "Mortgage", col = "lightblue")
+
+# Calculate mean, median, and standard deviation
+mean_val <- mean(mortgage)
+sd_val <- sd(mortgage)
+kurt_val = kurtosis(mortgage)
+skewness_val = skewness(mortgage)
+# Create legend with mean, median, and standard deviation
+legend(x = "topright",
+       legend = c(paste("Mean:", round(mean_val, 2)),
+                  paste("Standard Deviation:", round(sd_val, 2)),
+                  paste("Kurtosis:", round(kurt_val, 2)),
+                  paste("Skewness:", round(skewness_val, 2))),
+       bty = "n", col = "black", cex = 1.4)
+
+```
+
+
+```{r}
+
+library(ggplot2)
+
+ggplot(df, aes(x = Mortgage)) + 
+      geom_boxplot(fill = "lightblue", color = "black") +
+      labs(title = "Boxplot", x = "Mortgage")
+
+
+```
+
+
+```{r}
+# Calculate the Z-score for the Mortgage column
+z_scores <- (df$Mortgage - mean(df$Mortgage)) / sd(df$Mortgage)
+
+# Define a threshold (e.g., 3 standard deviations) for outlier detection
+threshold <- 3
+
+# Identify rows with Mortgage values greater than the threshold
+outlier_rows <- which(abs(z_scores) > threshold)
+
+# Remove the rows with outliers
+df <- df[-outlier_rows, ]
+
+# Count the number of rows removed
+num_removed <- length(outlier_rows)
+print(num_removed)
+```
+
+```{r}
+library(ggplot2)
+
+# Count the frequency of each education level
+education_counts <- table(df$Education)
+print(education_counts)
+# Convert education levels to meaningful labels
+education_labels <- c("Undergrad", "Graduate", "Advanced/Professional")
+
+# Create a data frame for the bar graph
+education_data <- data.frame(Education = education_labels, Count = as.numeric(education_counts))
+
+# Calculate the percentage of each education level
+education_data$Percentage <- education_data$Count / sum(education_data$Count) * 100
+
+# Create the bar graph
+bar_graph <- ggplot(education_data, aes(x = Education, y = Count, fill = Education)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(round(Percentage, 1), "%")), vjust = -0.5, size = 3) +
+  labs(title = "Education Level Distribution", x = "Education Level", y = "Count") +
+  theme_bw() +
+  scale_fill_manual(values = c("royalblue", "green", "orange"))
+
+# Display the bar graph
+print(bar_graph)
+
+
+```
+
+```{r}
+library(ggplot2)
+
+# Count the frequency of each family size
+family_counts <- table(df$Family)
+print(family_counts)
+# Convert family sizes to meaningful labels
+family_labels <- c("1", "2", "3", "4")
+
+# Create a data frame for the bar graph
+family_data <- data.frame(Family = family_labels, Count = as.numeric(family_counts))
+
+# Calculate the percentage of each family size
+family_data$Percentage <- family_data$Count / sum(family_data$Count) * 100
+
+# Create the bar graph
+bar_graph <- ggplot(family_data, aes(x = Family, y = Count, fill = Family)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(round(Percentage, 1), "%")), vjust = -0.5, size = 3.5) +
+  labs(title = "Family Size Distribution", x = "Family Size", y = "Count") +
+  theme_bw() +
+  scale_fill_manual(values = c("royalblue", "green", "orange", "purple"))
+
+# Display the bar graph
+print(bar_graph)
+
+
+```
+
+
+```{r}
+library(ggplot2)
+
+# Count the frequency of each loan acceptance status
+loan_counts <- table(df$Personal.Loan)
+
+# Convert loan acceptance status to meaningful labels
+loan_labels <- c("Did not accept", "Accept")
+
+# Create a data frame for the bar graph
+loan_data <- data.frame(Loan_Status = loan_labels, Count = as.numeric(loan_counts))
+
+# Calculate the percentage of each loan acceptance status
+loan_data$Percentage <- loan_data$Count / sum(loan_data$Count) * 100
+
+# Create the bar graph
+bar_graph <- ggplot(loan_data, aes(x = Loan_Status, y = Count, fill = Loan_Status)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(round(Percentage, 1), "%")), vjust = -0.5, size = 3) +
+  labs(title = "Personal.Loan Acceptance", x = "Loan Status", y = "Count") +
+  theme_bw() +
+  scale_fill_manual(values = c("lightgreen", "red"))
+
+# Display the bar graph
+print(bar_graph)
+
+```
+
+
+```{r}
+library(ggplot2)
+
+# Define the variables and their corresponding labels
+variables <- c("Personal.Loan", "Securities.Account", "CD.Account", "Online", "CreditCard")
+labels <- c("Personal.Loan", "Securities Account", "CD Account", "Online Banking", "Credit Card")
+
+# Create an empty list to store the bar graphs
+bar_graphs <- list()
+
+# Loop through each variable
+for (i in 1:length(variables)) {
+  # Count the frequency of each category
+  counts <- table(df[, variables[i]])
+  
+  # Create a data frame for the bar graph
+  data <- data.frame(Category = names(counts), Count = as.numeric(counts))
+  
+  # Calculate the percentage of each category
+  data$Percentage <- data$Count / sum(data$Count) * 100
+  
+  # Create the bar graph
+  graph <- ggplot(data, aes(x = Category, y = Count, fill = Category)) +
+    geom_bar(stat = "identity") +
+    geom_text(aes(label = paste0(round(Percentage, 1), "%")), vjust = -0.5, size = 3) +
+    labs(title = labels[i], x = "", y = "Count") +
+    theme_bw() +
+    scale_fill_manual(values = c("red", "lightgreen"))
+    # Set the bar colors for each category
+    
+  # Add the bar graph to the list
+  bar_graphs[[i]] <- graph
+}
+
+# Combine and display the bar graphs
+multi_plot <- do.call(gridExtra::grid.arrange, bar_graphs)
+print(multi_plot)
+
+```
+
+
+```{r}
+library(ggplot2)
+library(reshape2)
+
+# Calculate the correlation matrix
+correlation <- cor(df)
+print(correlation)
+
+# Reshape the correlation matrix
+melted_corr <- melt(correlation)
+print(melted_corr)
+
+# Create the correlation heatmap
+ggheatmap <- ggplot(melted_corr, aes(Var2, Var1, fill = value)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = round(value, 2)), color = "black", size = 3) +  # Add correlation values
+  scale_fill_gradient2(low = "blue", high = "red", mid = "grey100", 
+                       midpoint = 0, limits = c(-1, 1), space = "Lab",
+                       name = "Pearson\nCorrelation") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, size = 10, hjust = 1),
+        axis.text.y = element_text(size = 10)) +
+  coord_fixed() +
+  labs(title = "Correlation Heatmap")
+
+# Display the correlation heatmap
+print(ggheatmap)
+
+```
+
+
+```{r}
+df$CCAvg <- df$CCAvg * 12
+
+```
+
+```{r}
+
+# Load the required library
+library(dplyr)
+
+# Create the cross-tabulation
+cross_tab <- table(df$Family, df$Personal.Loan)
+print(cross_tab)
+
+# Create the cross-tabulation with proportions
+cross_tab_prop <- prop.table(cross_tab, margin = 1)
+```
+
+```{r}
+print(cross_tab_prop)
+```
+```{r}
+# Load the required library
+library(ggplot2)
+
+# Convert cross_tab_prop to a data frame for plotting
+cross_tab_prop_df <- as.data.frame.matrix(cross_tab_prop)
+cross_tab_prop_df$Family <- rownames(cross_tab_prop_df)
+
+# Reshape the data into long format
+library(reshape2)
+cross_tab_prop_df_long <- melt(cross_tab_prop_df, id.vars = "Family")
+
+# Create the stacked bar plot with custom colors
+ggplot(cross_tab_prop_df_long, aes(x = Family, y = value, fill = variable)) +
+  geom_bar(stat = "identity",position = position_stack(reverse = TRUE), color = "black") +
+  scale_fill_manual(values = c("lightblue", "lightgreen")) +
+  labs(x = "Family", y = "Proportion") +
+  theme_minimal() +
+  theme(legend.position = "top") +
+  guides(fill = guide_legend(ncol = 2)) +
+  geom_text(aes(label = paste0(round(value * 100, 1), "%")),
+            position = position_stack(reverse = TRUE , vjust = 0.5),
+            size = 3)
+
+
+
+```
+
+```{r}
+# Load the required library
+library(dplyr)
+
+# Create the cross-tabulation
+cross_tab <- table(df$Education, df$Personal.Loan)
+
+# Create the cross-tabulation with proportions
+cross_tab_prop <- prop.table(cross_tab, margin = 1)
+```
+
+```{r}
+# Load the required library
+library(ggplot2)
+
+# Convert cross_tab_prop to a data frame for plotting
+cross_tab_prop_df <- as.data.frame.matrix(cross_tab_prop)
+cross_tab_prop_df$Education <- rownames(cross_tab_prop_df)
+
+# Reshape the data into long format
+library(reshape2)
+cross_tab_prop_df_long <- melt(cross_tab_prop_df, id.vars = "Education")
+
+# Create the stacked bar plot with custom colors
+ggplot(cross_tab_prop_df_long, aes(x = Education, y = value, fill = variable)) +
+  geom_bar(stat = "identity",position = position_stack(reverse = TRUE), color = "black") +
+  scale_fill_manual(values = c("lightblue", "lightgreen")) +
+  labs(x = "Education", y = "Proportion") +
+  theme_minimal() +
+  theme(legend.position = "top") +
+  guides(fill = guide_legend(ncol = 2)) +
+  geom_text(aes(label = paste0(round(value * 100, 1), "%")),
+            position = position_stack(reverse = TRUE , vjust = 0.5),
+            size = 3)
+
+```
+
+```{r}
+# Load the required library
+library(dplyr)
+
+# Create the cross-tabulation
+cross_tab <- table(df$CD.Account, df$Personal.Loan)
+
+# Create the cross-tabulation with proportions
+cross_tab_prop <- prop.table(cross_tab, margin = 1)
+```
+
+```{r}
+# Load the required library
+library(ggplot2)
+
+# Convert cross_tab_prop to a data frame for plotting
+cross_tab_prop_df <- as.data.frame.matrix(cross_tab_prop)
+cross_tab_prop_df$CD.Account <- rownames(cross_tab_prop_df)
+
+# Reshape the data into long format
+library(reshape2)
+cross_tab_prop_df_long <- melt(cross_tab_prop_df, id.vars = "CD.Account")
+
+# Create the stacked bar plot with custom colors
+ggplot(cross_tab_prop_df_long, aes(x = CD.Account, y = value, fill = variable)) +
+  geom_bar(stat = "identity",position = position_stack(reverse = TRUE), color = "black") +
+  scale_fill_manual(values = c("lightblue", "lightgreen")) +
+  labs(x = "CD Account", y = "Proportion") +
+  theme_minimal() +
+  theme(legend.position = "top") +
+  guides(fill = guide_legend(ncol = 2)) +
+  geom_text(aes(label = paste0(round(value * 100, 1), "%")),
+            position = position_stack(reverse = TRUE , vjust = 0.5),
+            size = 3)
+```
+
+```{r}
+# Load the required library
+library(dplyr)
+
+# Create the cross-tabulation
+cross_tab <- table(df$Securities.Account, df$Personal.Loan)
+
+# Create the cross-tabulation with proportions
+cross_tab_prop <- prop.table(cross_tab, margin = 1)
+```
+
+```{r}
+# Load the required library
+library(ggplot2)
+
+# Convert cross_tab_prop to a data frame for plotting
+cross_tab_prop_df <- as.data.frame.matrix(cross_tab_prop)
+cross_tab_prop_df$Securities.Account <- rownames(cross_tab_prop_df)
+
+# Reshape the data into long format
+library(reshape2)
+cross_tab_prop_df_long <- melt(cross_tab_prop_df, id.vars = "Securities.Account")
+
+# Create the stacked bar plot with custom colors
+ggplot(cross_tab_prop_df_long, aes(x = Securities.Account, y = value, fill = variable)) +
+  geom_bar(stat = "identity",position = position_stack(reverse = TRUE), color = "black") +
+  scale_fill_manual(values = c("lightblue", "lightgreen")) +
+  labs(x = "Securities Account", y = "Proportion") +
+  theme_minimal() +
+  theme(legend.position = "top") +
+  guides(fill = guide_legend(ncol = 2)) +
+  geom_text(aes(label = paste0(round(value * 100, 1), "%")),
+            position = position_stack(reverse = TRUE , vjust = 0.5),
+            size = 3)
+```
+
+```{r}
+# Load the required library
+library(dplyr)
+
+# Create the cross-tabulation
+cross_tab <- table(df$Online, df$Personal.Loan)
+
+# Create the cross-tabulation with proportions
+cross_tab_prop <- prop.table(cross_tab, margin = 1)
+```
+
+```{r}
+# Load the required library
+library(ggplot2)
+
+# Convert cross_tab_prop to a data frame for plotting
+cross_tab_prop_df <- as.data.frame.matrix(cross_tab_prop)
+cross_tab_prop_df$Online <- rownames(cross_tab_prop_df)
+
+# Reshape the data into long format
+library(reshape2)
+cross_tab_prop_df_long <- melt(cross_tab_prop_df, id.vars = "Online")
+
+# Create the stacked bar plot with custom colors
+ggplot(cross_tab_prop_df_long, aes(x = Online, y = value, fill = variable)) +
+  geom_bar(stat = "identity",position = position_stack(reverse = TRUE), color = "black") +
+  scale_fill_manual(values = c("lightblue", "lightgreen")) +
+  labs(x = "Online", y = "Proportion") +
+  theme_minimal() +
+  theme(legend.position = "top") +
+  guides(fill = guide_legend(ncol = 2)) +
+  geom_text(aes(label = paste0(round(value * 100, 1), "%")),
+            position = position_stack(reverse = TRUE , vjust = 0.5),
+            size = 3)
+```
+
+```{r}
+# Specify the categorical variables
+categorical_variables <- c('Family', 'Education','Securities.Account', 'CD.Account', 'Online', 'CreditCard')
+selected_features <- character()
+# Iterate over each categorical variable
+for (variable in categorical_variables) {
+  # Create a contingency table between the categorical variable and the target variable
+  cross_tab <- table(df$Personal.Loan, df[[variable]])
+  
+  # Perform chi-squared test
+  chi_squared <- chisq.test(cross_tab)
+  
+  # Extract the test statistics
+  chi2_stat <- chi_squared$statistic
+  p <- chi_squared$p.value
+  
+  # Print the test results
+  cat(paste(variable,"\n"))
+  cat(paste("chi2 statistic:", format(chi2_stat, scientific = FALSE, digits = 5), "\n"))
+  cat(paste("p-value:", format(p, scientific = FALSE, digits = 5), "\n"))
+  
+  cat("\n")
+  
+   # Select features with p-values less than 0.05
+  if (p < 0.05) {
+    selected_features <- c(selected_features, variable)
+  }
+}
+print(selected_features)
+```
+
+```{r}
+# Assuming your target variable vector is named 'personal_loan'
+# Assuming your dataset is named 'df' and contains numerical variables
+
+# Extract the target variable vector
+personal_loan <- df$Personal.Loan
+
+# Iterate over numerical variable column names
+for (var in names(df)[!names(df) %in% "Personal.Loan"]) {
+  correlation <- cor(personal_loan, df[[var]])
+  cat("Correlation between Personal.Loan and", var, ":", correlation, "\n")
+}
+
+```
+
+
+
+
+
+```{r}
+final_df <- df[, !(names(df) %in% c("Age", "Experience", "Securities.Account", "Online", "CreditCard"))]
+
+```
+
+
+```{r}
+library(caret)
+
+# Select the categorical variables to be one-hot encoded
+categorical_vars <- c("Education", "Family")
+
+# Convert the categorical variables to factors
+final_df[categorical_vars] <- lapply(final_df[categorical_vars], factor)
+
+# Perform one-hot encoding
+dummy_data <- dummyVars(~., data = final_df[, categorical_vars])
+encoded_data <- predict(dummy_data, newdata = final_df[, categorical_vars])
+
+# Select the numerical variables to be scaled
+numerical_vars <- c("Income", "Mortgage", "CCAvg")
+
+# Create a new dataframe for scaled variables
+scaled_df <- data.frame(final_df[, numerical_vars])
+
+# Apply min-max scaling
+scaled_df <- apply(scaled_df, 2, function(x) (x - min(x)) / (max(x) - min(x)))
+
+# Set the column names of the scaled dataframe
+colnames(scaled_df) <- numerical_vars
+
+# Combine scaled_df and encoded_df
+combined_df <- cbind(scaled_df, encoded_data,data.frame(`Personal.Loan` = final_df$Personal.Loan, `CD.Account` = final_df$CD.Account))
+
+df_train =  combined_df
+print(head(df_train))
+```
+
+
+
+
+```{r}
+library(caTools)
+
+split <- sample.split(df_train, SplitRatio = 0.8)
+split
+   
+train_reg <- subset(df_train, split == "TRUE")
+test_reg <- subset(df_train, split == "FALSE")
+```
+
+
+```{r}
+library(caTools)
+library(ROCR) 
+# Training model
+logistic_model <- glm(Personal.Loan ~. , 
+                      data = train_reg, 
+                      family = "binomial")
+
+
+# Summary
+summary(logistic_model)
+
+# Predict test data based on model
+predict_reg <- predict(logistic_model, 
+                       test_reg, type = "response")
+
+
+# Changing probabilities
+predict_reg <- ifelse(predict_reg >0.5, 1, 0)
+
+# Evaluating model accuracy
+# using confusion matrix
+table(test_reg$Personal.Loan, predict_reg)
+
+missing_classerr <- mean(predict_reg != test_reg$Personal.Loan)
+print(paste('Accuracy =', 1 - missing_classerr))
+
+# Calculate precision
+precision <- sum(predict_reg[test_reg$Personal.Loan == 1] == 1) / sum(predict_reg == 1)
+print(paste("Precision =", precision))
+
+# Calculate recall
+recall <- sum(predict_reg[test_reg$Personal.Loan == 1] == 1) / sum(test_reg$Personal.Loan == 1)
+print(paste("Recall =", recall))
+
+# Calculate F1 score
+f1 <- 2 * (precision * recall) / (precision + recall)
+print(paste("F1 Score =", f1))
+# ROC-AUC Curve
+ROCPred <- prediction(predict_reg, test_reg$Personal.Loan) 
+ROCPer <- performance(ROCPred, measure = "tpr", 
+                      x.measure = "fpr")
+
+auc <- performance(ROCPred, measure = "auc")
+auc <- auc@y.values[[1]]
+auc
+
+# Plotting curve
+plot(ROCPer)
+plot(ROCPer, colorize = TRUE, 
+     print.cutoffs.at = seq(0.1, by = 0.1), 
+     main = "ROC CURVE")
+abline(a = 0, b = 1)
+
+auc <- round(auc, 4)
+legend(.6, .4, auc, title = "AUC", cex = 1)
+```
+
+```{r}
+library(e1071)
+library(caTools)
+library(class)
+
+initial_k <- sqrt(NROW(combined_df))
+# run KNN with 
+knn.12 <- knn(train=train_reg[,-11], test=test_reg[,-11], cl=train_reg$Personal.Loan, k=floor(initial_k))
+
+
+# Convert test_reg$Personal.Loan to factor with same levels as knn.12
+test_reg$Personal.Loan <- factor(test_reg$Personal.Loan, levels = levels(knn.12))
+
+cf.12 <- confusionMatrix(knn.12, test_reg$Personal.Loan) 
+
+# Print accuracy
+cat("Accuracy for k=",initial_k, cf.12$overall["Accuracy"], "\n")
+cf.12
+```
+```{r}
+library(e1071)
+library(caTools)
+library(class)
+
+initial_k <- sqrt(NROW(combined_df))
+# run KNN with 
+knn.12 <- knn(train=train_reg[,-11], test=test_reg[,-11], cl=train_reg$Personal.Loan, k = 4)
+
+
+# Convert test_reg$Personal.Loan to factor with same levels as knn.12
+test_reg$Personal.Loan <- factor(test_reg$Personal.Loan, levels = levels(knn.12))
+
+cf.12 <- confusionMatrix(knn.12, test_reg$Personal.Loan) 
+
+# Print accuracy
+cat("Accuracy for k=",initial_k, cf.12$overall["Accuracy"], "\n")
+cf.12
+```
+
+```{r}
+library(e1071)
+library(caTools)
+library(caret)
+
+set.seed(120)  # Setting Seed
+classifier_cl <- naiveBayes(Personal.Loan ~. , 
+                      data = train_reg)
+classifier_cl
+
+# Predicting on test data'
+y_pred <- predict(classifier_cl, newdata = test_reg)
+ 
+# Confusion Matrix
+cm <- table(test_reg$Personal.Loan, y_pred)
+cm
+ 
+# Model Evaluation
+confusionMatrix(cm)
+```
+
+
+```{r}
+# Generate new random data for prediction
+n <- 100  # Number of individuals to generate
+
+# Independent variables
+family_1 <- sample(c(0, 1), n, replace = TRUE)
+family_2 <- ifelse(family_1 == 0, sample(c(0, 1), n, replace = TRUE), 0)
+family_3 <- ifelse(family_1 == 0 & family_2 == 0, sample(c(0, 1), n, replace = TRUE), 0)
+family_4 <- ifelse(family_1 == 0 & family_2 == 0 & family_3 == 0, sample(c(0, 1), n, replace = TRUE), 0)
+education_undergraduate <- sample(c(0, 1), n, replace = TRUE)
+education_post <- ifelse(education_undergraduate == 0, sample(c(0, 1), n, replace = TRUE), 0)
+education_professional <- ifelse(education_undergraduate == 0 & education_post == 0, sample(c(0, 1), n, replace = TRUE), 0)
+# Create a data frame
+new_data <- data.frame(
+  Family.1 = family_1,
+  Family.2 = family_2,
+  Family.3 = family_3,
+  Family.4 = family_4,
+  Education.1 = education_undergraduate,
+  Education.2 = education_post,
+  Education.3 = education_professional,
+  Income = income,
+  Mortgage = mortgage,
+  Experience = experience,
+  CCAvg = ccva,
+  CD.Account = cd.acc
+)
+
+# Predict on the new data using your trained model
+new_data$predicted_probabilities <- predict(logistic_model, newdata = new_data, type = "response")
+
+# Rank individuals by predicted probabilities
+ranked_data <- new_data[order(-new_data$predicted_probabilities), ]
+
+# Set a threshold and generate target list
+threshold <- quantile(new_data$predicted_probabilities, probs = 0.2)  # Top 20% of individuals
+target_list <- ranked_data[ranked_data$predicted_probabilities >= threshold, ]
+
+# Display the target list
+print(target_list)
+```
+
+
